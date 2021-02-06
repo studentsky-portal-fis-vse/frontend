@@ -23,20 +23,31 @@
               Materiály
             </vs-navbar-item>
             <vs-navbar-item to="/teachers" :active="currentRouteName == 'Teachers'">
-              Hodnocení učitelů
+              Přehled učitelů
             </vs-navbar-item>
             <vs-navbar-item to="/subjects" :active="currentRouteName == 'Subjects'">
-              Hodnocení předmětů
+              Přehled předmětů
+            </vs-navbar-item>
+          </template>
+        </vs-navbar-group>
+        <vs-navbar-group>
+          Discord
+          <template #items>
+            <vs-navbar-item to="/discord" :active="currentRouteName == 'Discord'">
+              Přehled
+            </vs-navbar-item>
+            <vs-navbar-item to="/discord/verification" :active="currentRouteName == 'DiscordVerification'">
+              Verifikace
             </vs-navbar-item>
           </template>
         </vs-navbar-group>
          <template #right>
            <vs-avatar primary size="30">
             <template #text>
-              LightCap
+              {{getUser().name}}
             </template>
           </vs-avatar>
-          <vs-button flat v-on:click="logOut">Log Out</vs-button>
+          <vs-button flat v-on:click="logOut">Odhlásit se</vs-button>
         </template>
       </vs-navbar>
     </div>
@@ -60,6 +71,7 @@ module.exports = {
   methods:{
     logOut: function () {
       localStorage.removeItem('token');
+      this.removeUser();
       location.reload();
     }
   }
@@ -75,7 +87,7 @@ module.exports = {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: left;
-  padding-top: 55px;
+  padding-top: 80px;
   background-color: rgb(218, 218, 218);
   height: 100vh;
 } 

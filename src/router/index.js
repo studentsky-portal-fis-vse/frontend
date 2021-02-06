@@ -13,28 +13,45 @@ const routes = [
   {
     path: "/register",
     name: "Register",
+    meta: { title: 'Registrace' },
     component: () =>
       import("../views/Register.vue")
   },{
     path: "/login",
     name: "Login",
+    meta: { title: 'Přihlášení' },
     component: () =>
       import("../views/Login.vue")
   },{
     path: "/materials",
     name: "Materials",
+    meta: { title: 'Studentské materiály' },
     component: () =>
       import("../views/Materials.vue")
   },{
     path: "/teachers",
     name: "Teachers",
+    meta: { title: 'Přehled učitelů' },
     component: () =>
       import("../views/Teachers.vue")
   },{
     path: "/Subjects",
     name: "Subjects",
+    meta: { title: 'Přehled předmětů' },
     component: () =>
       import("../views/Subjects.vue")
+  },{
+    path: "/discord",
+    name: "Discord",
+    meta: { title: 'Přehled diskord serverů' },
+    component: () =>
+      import("../views/Discord.vue")
+  },{
+    path: "/discord/Verification",
+    name: "DiscordVerification",
+    meta: { title: 'Discord verifikace' },
+    component: () =>
+      import("../views/Discord-verification.vue")
   }
 ];
 
@@ -71,4 +88,10 @@ router.beforeEach((to, from, next) => {
   next();
 });
 
+const DEFAULT_TITLE = 'Studentský portál VŠE';
+router.afterEach((to) => {
+    Vue.nextTick(() => {
+        document.title = to.meta.title || DEFAULT_TITLE;
+    });
+});
 export default router;

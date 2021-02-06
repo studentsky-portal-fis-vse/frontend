@@ -6,9 +6,11 @@
     <div class="login-wrapper">
       <vs-input class="login-input" label="Školní xname" v-model="username" placeholder="pepa01">
       </vs-input>
+      <span class="error" v-if="usernameError">Zadejte platné jméno</span>
       <br>
-      <vs-input class="login-input" label="Heslo" v-model="password" placeholder="pepa01@vse.cz" type="password">
+      <vs-input class="login-input" label="Heslo" v-model="password" placeholder="*****" type="password">
       </vs-input>
+      <span class="error" v-if="passwordError">Zadejte heslo</span>
       <br>
       <vs-button v-on:click="login" style="margin:auto">
         Přihlásit se
@@ -27,28 +29,54 @@ module.exports = {
   data: function () {
     return {
       username: "",
-      password: ""
+      usernameError: false,
+      password: "",
+      passwordError: false
     }
   },
   props: {
     //msg: String
   },
   methods: {
+    isFormValid: function () {
+      if(this.username.length < 3)
+        this.usernameError = true;
+      else
+        this.usernameError = false
+      if(this.password.length < 3)
+        this.passwordError = true;
+      else
+        this.passwordError = false
+
+      return !this.usernameError && !this.passwordError
+    },
     login: async function() {
-      fetch('https://run.mocky.io/v3/8b9a7773-3912-45e7-a586-e6558cad5551', {
+      if(!this.isFormValid()) return
+
+      const loading = this.$vs.loading()
+      let response = await fetch('https://run.mocky.io/v3/8b9a7773-3912-45e7-a586-e6558cad5551', {
         method: 'POST',
         headers: {
         'Content-Type': 'application/json',
         },
-        body: JSON.stringify({username:"",password:""}),
-      }).then(response  => {
-        if(response.status === 200){
-          response.json().then(data => {
-              localStorage.token = data.token;
-              location.reload();
-          });
-        }
+        body: JSON.stringify({username:this.username,password:this.password}),
       })
+    
+      let token;
+      if(response.status === 200){
+        token = response.json().token
+      }else {
+        loading.close();
+        return false;
+      }
+      localStorage.token = token;
+
+      if(await this.refreshUser())       
+        location.reload();
+      else
+        console.log("badLogin")
+
+      loading.close();
     }
   }
 }
@@ -85,5 +113,13 @@ module.exports = {
 
 .redirect-message{
   text-align: center;
+}
+
+.error{
+    display: block;
+    text-align: center;
+    font-size: 13px;
+    margin: 10px;
+    color: red;
 }
 </style>
