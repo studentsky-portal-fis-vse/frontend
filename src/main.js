@@ -8,7 +8,12 @@ import "vuesax/dist/vuesax.css" //Vuesax styles
 
 Vue.use(Vuesax)
 
-//Vue.use(VueLocalStorage)
+const moment = require('moment')
+require('moment/locale/cs')
+
+Vue.use(require('vue-moment'), {
+  moment
+})
 
 Vue.config.productionTip = false
 
@@ -30,27 +35,46 @@ const MyPlugin = {
         banned: localStorage.banned
       }
     }
+    Vue.prototype.getToken = () => {
+      try{
+        return JSON.parse(atob(localStorage.token.split('.')[1]));
+      } catch (e) {
+        return null;
+      }
+    }
+    Vue.prototype.refreshToken = async () => {
+      if(localStorage.refreshingToken) return;
+      localStorage.refreshingToken = true;
+
+      let response = await Vue.prototype.post(`authentication/refresh-token`,{})
+    
+      if(response.error)
+        Vue.prototype.ShowErrorTooltip("Nepodařilo se obnovit token")
+
+      if(response.code === 200){
+        localStorage.token = response.data.token
+      }
+      else {
+        Vue.prototype.ShowErrorTooltip(response.data.message)
+      }
+
+      localStorage.removeItem("refreshingToken");
+    }
     Vue.prototype.refreshUser = async () => {
       if(!localStorage.token) return false;
-      //https://run.mocky.io/v3/6dcba69c-8925-4526-8182-9b400716f3c8
-      let response = await fetch('https://run.mocky.io/v3/6dcba69c-8925-4526-8182-9b400716f3c8', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization' : `Bearer ${localStorage.token}`
-        },
-        body: "",
-      })
+
+      let response = await Vue.prototype.get(`authentication/current-user`,{})
 
       let user;
-      if(response.status === 200){
-        user = await response.json()     
-      }else{
+      if(response.code === 200){
+        user = response.data;   
+      }else{       
+        localStorage.removeItem("token")
         return false;
       }
 
       Vue.prototype.saveUser({
-        name: user.name,
+        name: user.name || "Student",
         username: user.username,
         admin: user.admin,
         verified: user.verified,
@@ -65,6 +89,71 @@ const MyPlugin = {
       localStorage.removeItem("verified")
       localStorage.removeItem("admin")
       localStorage.removeItem("banned")
+    },
+    Vue.prototype.ShowMainTooltip = (title, message) => {
+      Vue.prototype.$vs.notification({
+        progress: 'auto',
+        color: 'success',
+        position: 'top-center',
+        title: title || 'Něco se pokazilo',
+        text: message || ""
+      })
+    },
+    Vue.prototype.ShowErrorTooltip = (title, message) => {
+      Vue.prototype.$vs.notification({
+        progress: 'auto',
+        color: 'danger',
+        position: 'top-center',
+        title: title || 'Něco se pokazilo',
+        text: message || ""
+      })
+    },
+    Vue.prototype.post = async (url, data) => {
+      let response;
+
+      try{
+        response = await fetch(`${process.env.VUE_APP_API_URL}/${url}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization' : `Bearer ${localStorage.token}`
+          },
+          body: JSON.stringify(data),
+        })
+      }catch(e){
+        return {
+          error: e
+        }
+      }
+      let responseJson = await response.json()
+
+      return {
+        code: response.status,
+        data: responseJson
+      };
+    },
+    Vue.prototype.get = async (url) => {
+      let response;
+
+      try{
+        response = await fetch(`${process.env.VUE_APP_API_URL}/${url}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization' : `Bearer ${localStorage.token}`
+          },
+        })
+      }catch(e){
+        return {
+          error: e
+        }
+      }
+      let responseJson = await response.json()
+
+      return {
+        code: response.status,
+        data: responseJson
+      };
     }
   },
 }

@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div class="wrapper">
-      <div v-if="token" class="center examplex">
+      <div v-if="getToken()" class="center examplex">
         <vs-navbar center-collapsed v-model="active">
           <template #left>
             <img alt="VŠE logo" src="/images/logo.png" class="logo-sm">
@@ -51,7 +51,7 @@
             <vs-button flat v-on:click="logOut">Odhlásit se</vs-button>
           </template>
         </vs-navbar>
-      </div>
+      </div>{{checkToken()}}
       <router-view />
       <div class="push"></div>
     </div>
@@ -65,9 +65,13 @@ module.exports = {
   name: 'App',
   data: function () {
     return {
-      token: localStorage.token,
-      active: this.$route.name
+      moment: this.$moment,
+      active: this.$route.name,
+      checkTokenInterval: null
     }
+  },
+  created: function(){
+    this.checkTokenInterval = setInterval(() => this.checkToken(), 6000);
   },
   computed: {
     currentRouteName: function (){
@@ -75,8 +79,19 @@ module.exports = {
     }
   },
   methods:{
+    checkToken: function(){
+      if(!localStorage.token) return
+      let diff = this.moment.unix(this.getToken().exp).diff(this.moment())
+      if(diff < 18000){
+        this.refreshToken();
+      }
+      if(diff <= 0){
+        this.logOut();
+      }
+    },
     logOut: function () {
       localStorage.removeItem('token');
+      localStorage.removeItem("refreshingToken");
       this.removeUser();
       location.reload();
     }

@@ -1,11 +1,11 @@
 <template>
   <div class="discord">
     <h1 class="title">Discord servery</h1>
-    <div class="server-wrapper">
-      <div v-for="server in servers" :key="server" class="server">
-        <a :href="server.href">
+    <div ref="servers" class="server-wrapper">
+      <div v-for="server in servers" :key="server.id" class="server">
+        <a :href="`https://discord.gg/${server.invite}`">
           <div class="server__img-wrapper">
-            <img :src="`https://discord.com/api/guilds/${server.id}/embed.png?style=banner3`">
+            <img :src="`https://discord.com/api/guilds/${server.embed}/embed.png?style=banner3`">
           </div>
         </a>
       </div>
@@ -27,6 +27,7 @@
   text-align: center;
   margin:0px auto;
   justify-content: center;
+  min-height: 200px;
 }
 
 .server{
@@ -67,11 +68,27 @@ export default {
   },
   data: function(){
     return {
-      servers: [
-        {id:"760863954607669269", href:"https://discord.gg/yZMhTVQdkX"},
-        {id:"511621720600215660", href:"https://discord.gg/fWPje3z"}
-        ]
+      servers: []
     }
+  },
+  mounted: async function(){
+    const loading = this.$vs.loading({
+      target: this.$refs.servers
+    })  
+
+    let response = await this.get(`discord-servers`,{})
+    
+    if(response.error)
+      this.ShowErrorTooltip()
+
+    if(response.code === 200){
+      this.servers = response.data
+    }
+    else {
+      this.ShowErrorTooltip(response.data.message)
+    }
+
+    loading.close();
   }
 };
 </script>
