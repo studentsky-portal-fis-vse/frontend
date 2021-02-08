@@ -1,5 +1,5 @@
 <template>
-  <div class="Discord-verification">
+  <div class="Discord-verification">{{getUser()}}
     <h1 class="text-center">Ověření účtu na fakultním Discord serveru.</h1>
     <div v-if="getUser().verified" class="text-center">
       <h3 class="account-verified text-center">Váš účet byl verifikován</h3>
@@ -10,11 +10,11 @@
         Účet aktivujete tak, že do diskordu pošlete tuto zprávu 
       </p>
     </div>
-    <div class="discord-message">
+    <div class="discord-message" v-if="verificationCode">
       <div class="discord-message__avatar"></div>
       <div class="discord-message__content">
         <div class="discord-message__username">lajtkek</div>
-        <div class="discord-message__text">+verify a1c50ca42ad78c7c72a2dcd229d0bd35</div>
+        <div class="discord-message__text">+verify {{verificationCode}}</div>
       </div>
     </div>
   </div>
@@ -28,6 +28,28 @@ export default {
   name: "Discord-verification",
   components: {
     //HelloWorld
+  },
+  data: function(){
+    return {
+      verificationCode: null
+    }
+  },
+  mounted: async function(){
+    const loading = this.$vs.loading({})  
+
+    let response = await this.get(`discord-verifications/verification`,{})
+    
+    if(response.error)
+      this.ShowErrorTooltip()
+
+    if(response.code === 200){
+      this.verificationCode = response.data.code
+    }
+    else {
+      this.ShowErrorTooltip(response.data.message)
+    }
+
+    loading.close();
   }
 };
 </script>
@@ -77,6 +99,8 @@ export default {
     background: #555555;
     border-radius: 50%;
     margin: 10px;
+    background-image: url("/images/peepo.png");
+    background-size: 100% 100%;
 }
 
 .discord-message__username {
