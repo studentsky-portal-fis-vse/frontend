@@ -20,7 +20,7 @@
       </vs-button>  
       <span class="error" v-if="termsAcceptError">Musíte souhlasit s podmínkama</span>
       <span class="error" v-if="xnameError">Zadejte platné jméno</span>
-      <span class="error" v-if="passwordError">Zadejte heslo, co má alespoň 5 znaků</span>
+      <span class="error" v-if="passwordError">Zadejte heslo, co má mezi 8 až 64 znaky</span>
       <br>
       <vs-alert title="Po registraci je potřeba účet aktivovat!" color="primary">
         Po registraci bude na email username@vse.cz odeslán odkaz pro aktivaci účtu.
@@ -67,11 +67,11 @@ module.exports = {
   },
   methods: {
     isFormValid: function () {
-      if(this.xname.length < 3)
+      if(this.xname.length < 6 || this.xname.length > 10)
         this.xnameError = true;
       else
         this.xnameError = false
-      if(this.password.length <= 5)
+      if(this.password.length < 8 || this.password.length > 64)
         this.passwordError = true;
       else
         this.passwordError = false
@@ -80,27 +80,25 @@ module.exports = {
 
       return !this.xnameError && !this.passwordError && !this.termsAcceptError
     },
-    register: function() {
+    register: async function() {
       if(!this.isFormValid()) return;
       const loading = this.$vs.loading()
 
-      fetch('https://run.mocky.io/v3/ec258bdf-5e44-4380-9e3f-b369b0466da7', {
-        method: 'POST',
-        headers: {
-        'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({name:"",username:"",password:""}),
-      }).then(response  => {
-        if(response.status === 201){
-          this.$router.push('/login') 
-        }
-        else{
-          console.log("Něco se pokazilo")
-        }
-        
-      }).finally(() => {
-        loading.close();
-      });
+      let response = await this.post(`authentication/registration`,{
+        name:this.username,
+        username: this.xname,
+        password:this.password
+      })
+
+      if(response.error)
+        this.ShowErrorTooltip()
+
+      if(response.code === 201){      
+        this.$router.push('Login') 
+        this.ShowMainTooltip("Email byl odeslán na váš školní email")
+      }
+
+      loading.close();
     }
   }
 }

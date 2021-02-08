@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="logo-wrapper">
-      <img alt="VŠE logo" src="/images/logo.png" class="logo"> {{logo}}
+      <img alt="VŠE logo" src="/images/logo.png" class="logo">
     </div>
     <div class="login-wrapper">
       <vs-input class="login-input" label="Školní xname" v-model="username" placeholder="pepa01">
@@ -51,27 +51,24 @@ module.exports = {
       if(!this.isFormValid()) return
 
       const loading = this.$vs.loading()
-      let response = await fetch('https://run.mocky.io/v3/8b9a7773-3912-45e7-a586-e6558cad5551', {
-        method: 'POST',
-        headers: {
-        'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({username:this.username,password:this.password}),
-      })
+      let response = await this.post(`authentication/login`,{username:this.username,password:this.password})
     
-      let token;
-      if(response.status === 200){
-        token = response.json().token
-      }else {
+      if(response.error)
+        this.ShowErrorTooltip()
+
+      if(response.code === 200){
+        localStorage.token = response.data.token
+      }
+      else {
+        this.ShowErrorTooltip(response.data.message)
         loading.close();
         return false;
       }
-      localStorage.token = token;
 
       if(await this.refreshUser())       
         location.reload();
       else
-        console.log("badLogin")
+        this.ShowErrorTooltip(response.data.message)
 
       loading.close();
     }
