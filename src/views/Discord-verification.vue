@@ -1,5 +1,5 @@
 <template>
-  <div class="Discord-verification">{{getUser()}}
+  <div class="Discord-verification">
     <h1 class="text-center">Ověření účtu na fakultním Discord serveru.</h1>
     <div v-if="getUser().verified" class="text-center">
       <h3 class="account-verified text-center">Váš účet byl verifikován</h3>
