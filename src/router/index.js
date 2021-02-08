@@ -47,11 +47,17 @@ const routes = [
     component: () =>
       import("../views/Discord.vue")
   },{
-    path: "/discord/Verification",
+    path: "/discord/verification",
     name: "DiscordVerification",
     meta: { title: 'Discord verifikace' },
     component: () =>
       import("../views/Discord-verification.vue")
+  },{
+    path: "/training",
+    name: "Training",
+    meta: { title: 'Terénování' },
+    component: () =>
+      import("../views/Training.vue")
   }
 ];
 

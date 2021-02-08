@@ -1,6 +1,6 @@
 <template>
-  <div class="Subjects">
-    <h1 class="title">Přehled předmětů</h1>
+  <div class="Training">
+    <h1 class="title">Trénování předmětů</h1>
   </div>
 </template>
 
@@ -9,7 +9,7 @@
 //import HelloWorld from "@/components/HelloWorld.vue";
 
 export default {
-  name: "Subjects",
+  name: "Training",
   components: {
     //HelloWorld
   }

@@ -32,21 +32,7 @@ export default {
 };
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: left;
-  padding-top: 80px;
-  background-color: rgb(218, 218, 218);
-  height: 100vh;
-} 
-
-.text-center{
-  text-align: center;
-}
-
+<style scoped>
 .account-verified{
   margin: 20px;
   color: green;

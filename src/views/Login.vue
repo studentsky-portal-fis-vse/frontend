@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="logo-wrapper">
-      <img alt="VŠE logo" src="../assets/logo.png" class="logo">
+      <img alt="VŠE logo" src="/images/logo.png" class="logo"> {{logo}}
     </div>
     <div class="login-wrapper">
       <vs-input class="login-input" label="Školní xname" v-model="username" placeholder="pepa01">
@@ -33,9 +33,6 @@ module.exports = {
       password: "",
       passwordError: false
     }
-  },
-  props: {
-    //msg: String
   },
   methods: {
     isFormValid: function () {
@@ -82,7 +79,6 @@ module.exports = {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .logo-wrapper{
   width:100%; 

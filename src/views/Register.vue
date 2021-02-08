@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="logo-wrapper">
-      <img alt="VŠE logo" src="../assets/logo.png" class="logo">
+      <img alt="VŠE logo" src="/images/logo.png" class="logo">
     </div>
     <div class="register-wrapper">
       <vs-input class="register-input" label="Školní xname" v-model="xname" placeholder="pepa01">

@@ -1,6 +1,6 @@
 <template>
   <div class="Teachers">
-    Teachers
+    <h1 class="title">Přehled učitelů</h1>
   </div>
 </template>
 

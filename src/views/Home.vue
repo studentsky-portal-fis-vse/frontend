@@ -1,6 +1,7 @@
 <template>
   <div class="home">
-    YESS
+    <h1 class="title">Benis :DDD</h1>
+    <img alt="VŠE logo" src="/images/Benis.png" class="logo" style="width:100%">
   </div>
 </template>
 
