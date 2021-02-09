@@ -49,28 +49,18 @@ module.exports = {
     },
     login: async function() {
       if(!this.isFormValid()) return
-
       const loading = this.$vs.loading()
-      let response = await this.post(`authentication/login`,{username:this.username,password:this.password})
-    
-      if(response.error)
-        this.ShowErrorTooltip()
 
-      if(response.code === 200){
-        localStorage.token = response.data.token
-      }
-      else {
-        this.ShowErrorTooltip(response.data.message)
-        loading.close();
-        return false;
-      }
-
-      if(await this.refreshUser())       
-        location.reload();
-      else
-        this.ShowErrorTooltip(response.data.message)
-
-      loading.close();
+      await this.post(`authentication/login`,{username:this.username,password:this.password},{
+        onSuccess: async (data) => {
+          localStorage.token = data.token
+          if(await this.refreshUser())       
+            location.reload();
+        },
+        allways: () => {
+          loading.close();
+        }
+      })
     }
   }
 }

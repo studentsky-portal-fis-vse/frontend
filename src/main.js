@@ -144,7 +144,7 @@ const MyPlugin = {
         if(options.onError)
           await options.onError(responseJson, response.status)
         else
-          Vue.prototype.ShowErrorTooltip("Něco se pokazilo")
+          Vue.prototype.ShowErrorTooltip(responseJson.message || "Něco se pokazilo")
       
       if(options.allways)
         await options.allways()
