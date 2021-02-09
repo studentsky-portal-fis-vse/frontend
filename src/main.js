@@ -23,7 +23,8 @@ const MyPlugin = {
       localStorage.name = userData.name;
       localStorage.username = userData.username;
       localStorage.verified = userData.verified;
-      localStorage.admin = userData.admin;
+      //TODO: Remove for production
+      localStorage.admin = true || userData.admin;
       localStorage.banned = userData.banned;
     }
     Vue.prototype.getUser = () => {
@@ -63,25 +64,23 @@ const MyPlugin = {
     Vue.prototype.refreshUser = async () => {
       if(!localStorage.token) return false;
 
-      let response = await Vue.prototype.get(`authentication/current-user`,{})
-
-      let user;
-      if(response.code === 200){
-        user = response.data;   
-      }else{       
-        localStorage.removeItem("token")
-        return false;
-      }
-
-      Vue.prototype.saveUser({
-        name: user.name || "Student",
-        username: user.username,
-        admin: user.admin,
-        verified: user.verified,
-        banned: user.banned
-      });
-      
-      return true;
+      let vue = Vue.prototype;
+      let result = await Vue.prototype.get(`authentication/current-user`,{
+        onSuccess: (data) => {
+          let user = data
+          vue.saveUser({
+            name: user.name || "Student",
+            username: user.username,
+            admin: user.admin,
+            verified: user.verified,
+            banned: user.banned
+          });
+        },
+        onError: () => {
+          localStorage.removeItem("token")
+        }
+      })
+      return result.success
     }
     Vue.prototype.removeUser = () => {
       localStorage.removeItem("name")
@@ -108,9 +107,9 @@ const MyPlugin = {
         text: message || ""
       })
     },
-    Vue.prototype.post = async (url, data) => {
+    Vue.prototype.post = async (url, data = {}, options = {}) => {
       let response;
-
+      let success = false;
       try{
         response = await fetch(`${process.env.VUE_APP_API_URL}/${url}`, {
           method: 'POST',
@@ -121,41 +120,89 @@ const MyPlugin = {
           body: JSON.stringify(data),
         })
       }catch(e){
+        if(options.onFail)
+          await options.onFail()
+        else  
+          Vue.prototype.ShowErrorTooltip("Něco se pokazilo")    
+
+        if(options.allways)
+          await options.allways()
+
         return {
+          success: success,
           error: e
         }
       }
       let responseJson = await response.json()
 
+      if(response.status === 200 || response.status === 201){
+        if(options.onSuccess){
+          await options.onSuccess(responseJson, response.status)
+          success = true;
+        }
+      }else
+        if(options.onError)
+          await options.onError(responseJson, response.status)
+        else
+          Vue.prototype.ShowErrorTooltip("Něco se pokazilo")
+      
+      if(options.allways)
+        await options.allways()
+
       return {
+        success: success,
         code: response.status,
         data: responseJson
       };
     },
-    Vue.prototype.get = async (url) => {
+    Vue.prototype.get = async (url, options = {}) => {
       let response;
-
+      let success = false;
       try{
         response = await fetch(`${process.env.VUE_APP_API_URL}/${url}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
             'Authorization' : `Bearer ${localStorage.token}`
-          },
+          }
         })
       }catch(e){
+        if(options.onFail)
+          await options.onFail()
+        else  
+          Vue.prototype.ShowErrorTooltip("Něco se pokazilo")    
+
+        if(options.allways)
+          await options.allways()
+
         return {
+          success: success,
           error: e
         }
       }
       let responseJson = await response.json()
 
+      if(response.status === 200 || response.status === 201){
+        if(options.onSuccess){
+          await options.onSuccess(responseJson, response.status)
+          success = true;
+        }
+      }else
+        if(options.onError)
+          await options.onError(responseJson, response.status)
+        else
+          Vue.prototype.ShowErrorTooltip("Něco se pokazilo")
+      
+      if(options.allways)
+        await options.allways()
+      
       return {
+        success: success,
         code: response.status,
         data: responseJson
       };
     }
-  },
+  }
 }
 Vue.use(MyPlugin)
 

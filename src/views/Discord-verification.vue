@@ -1,11 +1,11 @@
 <template>
   <div class="Discord-verification">
     <h1 class="text-center">Ověření účtu na fakultním Discord serveru.</h1>
-    <div v-if="getUser().verified" class="text-center">
+    <div class="text-center">
       <h3 class="account-verified text-center">Váš účet byl verifikován</h3>
       <p class="text-center">Pokud se něco pokazilo a nebyla ti přidělena role <span class="discord-role">Verifikovaný student VŠE</span>, zkus použít kód znovu nebo pingnout někoho z moderátorů serveru.</p>
     </div>
-    <div v-else>
+    <div>
       <p class="text-center">
         Účet aktivujete tak, že do diskordu pošlete tuto zprávu 
       </p>
@@ -36,20 +36,15 @@ export default {
   },
   mounted: async function(){
     const loading = this.$vs.loading({})  
-
-    let response = await this.get(`discord-verifications/verification`,{})
-    
-    if(response.error)
-      this.ShowErrorTooltip()
-
-    if(response.code === 200){
-      this.verificationCode = response.data.code
-    }
-    else {
-      this.ShowErrorTooltip(response.data.message)
-    }
-
-    loading.close();
+    let vue = this;
+    await this.get(`discord-verifications/verification`,{
+      onSuccess: (data) => {
+        vue.verificationCode = data.code
+      },
+      allways: () => {
+        loading.close()
+      }
+    })
   }
 };
 </script>

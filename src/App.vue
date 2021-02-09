@@ -112,6 +112,10 @@ module.exports = {
   height: 92vh;
 } 
 
+.center{
+  margin: auto !important;
+}
+
 .title{
   text-align: center;
 }
