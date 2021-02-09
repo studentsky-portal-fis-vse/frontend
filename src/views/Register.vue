@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="content-wrapper">
     <div class="logo-wrapper">
       <img alt="VŠE logo" src="/images/logo.png" class="logo">
     </div>
@@ -109,7 +109,6 @@ module.exports = {
 .logo-wrapper{
   width:100%; 
   padding: 50px;
-  box-sizing: border-box;
 }
 
 .logo{

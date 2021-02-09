@@ -1,5 +1,5 @@
 <template>
-  <div class="Subjects">
+  <div id="content-wrapper">
     <h1 class="title">Přehled předmětů</h1>
   </div>
 </template>

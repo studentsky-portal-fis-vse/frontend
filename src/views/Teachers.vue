@@ -1,5 +1,5 @@
 <template>
-  <div class="Teachers">
+  <div id="content-wrapper">
     <h1 class="title">Přehled učitelů</h1>
   </div>
 </template>

@@ -1,5 +1,5 @@
 <template>
-  <div class="Discord-verification">
+  <div id="content-wrapper">
     <h1 class="text-center">Ověření účtu na fakultním Discord serveru.</h1>
     <div class="text-center">
       <h3 class="account-verified text-center">Váš účet byl verifikován</h3>
@@ -19,11 +19,10 @@
     </div>
   </div>
 </template>
+<style scoped>
 
+</style>
 <script>
-// @ is an alias to /src
-//import HelloWorld from "@/components/HelloWorld.vue";
-
 export default {
   name: "Discord-verification",
   components: {
@@ -35,7 +34,9 @@ export default {
     }
   },
   mounted: async function(){
-    const loading = this.$vs.loading({})  
+    let loading = this.$vs.loading({
+      target: "#content-wrapper"
+    })  
     let vue = this;
     await this.get(`discord-verifications/verification`,{
       onSuccess: (data) => {

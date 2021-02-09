@@ -1,5 +1,5 @@
 <template>
-  <div class="Materials">
+  <div id="content-wrapper">
     <h1 class="title">Studijní materiály</h1>
     <div class="materials-wrapper">
       <div class="materials-wrapper__filter">
@@ -97,7 +97,6 @@
   padding-top: 5px;
   padding-right: 10px;
   white-space: nowrap;
-  box-sizing: border-box;
 }
 
 .material__actions i{
@@ -106,7 +105,7 @@
 }
 
 .material__info{
-      width: calc(100% - 60px);
+    width: calc(100% - 60px);
     line-height: 20px;
     float: left;
     text-align: left;
@@ -115,7 +114,6 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    box-sizing: border-box;
 }
 </style>
 <script>

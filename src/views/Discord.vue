@@ -1,5 +1,5 @@
 <template>
-  <div class="discord">
+  <div id="content-wrapper">
     <h1 class="title">Discord servery</h1>
     <div ref="servers" class="server-wrapper">
       <div v-for="server in servers" :key="server.id" class="server">
@@ -53,6 +53,7 @@
   margin:0px auto;
   justify-content: center;
   min-height: 200px;
+  position: relative;
 }
 
 .server{
@@ -110,7 +111,9 @@ export default {
   },
   methods: {
     createServer: async function(){
-      const loading = this.$vs.loading()
+      const loading = this.$vs.loading({
+        target: this.$refs.servers
+      })
       let vue = this;
 
       await this.post(`admin/discord-servers`,this.serverData, {
@@ -131,7 +134,9 @@ export default {
       })
     },
     deleteServer: async function(id){
-      const loading = this.$vs.loading()
+      const loading = this.$vs.loading({
+        target: this.$refs.servers
+      })
       let vue = this;
 
       await this.delete(`admin/discord-servers`,id, {

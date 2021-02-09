@@ -1,5 +1,5 @@
 <template>
-  <div class="Training">
+  <div id="content-wrapper">
     <h1 class="title">Trénování předmětů</h1>
   </div>
 </template>
