@@ -3,11 +3,14 @@
     <h1 class="title">Discord servery</h1>
     <div ref="servers" class="server-wrapper">
       <div v-for="server in servers" :key="server.id" class="server">
-        <a :href="`https://discord.gg/${server.invite}`">
+        <a :href="`${server.invite}`">
           <div class="server__img-wrapper">
-            <img :src="`https://discord.com/api/guilds/${server.embed}/embed.png?style=banner3`">
+            <img :src="`https://discord.com/api/guilds/${server.guildId}/embed.png?style=banner3`">
           </div>
         </a>
+        <vs-button v-if="getUser().admin" class="center" v-on:click="deleteServer(server.id)" color="danger">
+          Smazat
+        </vs-button>
       </div>
     </div>
     <div>
@@ -22,13 +25,10 @@
           </h4>
         </template>
         <div>
-          <vs-input v-model="serverData.id" placeholder="ID" block>
+          <vs-input v-model="serverData.guildId" label="Server ID" placeholder="760863954607669269" block>
           </vs-input>
           <br>
-          <vs-input v-model="serverData.embed" placeholder="Embed link" block>
-          </vs-input>
-          <br>
-          <vs-input v-model="serverData.href" placeholder="Invite link" block>
+          <vs-input v-model="serverData.invite" label="Invite link" placeholder="https://discord.gg/cvdjPnuCta" block>
           </vs-input>
         </div>
         <template #footer>
@@ -95,9 +95,8 @@ export default {
     return {
       servers: [],
       serverData: {
-        id: "",
-        href: "",
-        embed: ""
+        guildId: "",
+        invite: ""
       },
       creatingServer: false
     }
@@ -115,10 +114,29 @@ export default {
       let vue = this;
 
       await this.post(`admin/discord-servers`,this.serverData, {
-        onSuccess: async () => {
+        onSuccess: async (data) => {
           vue.serverData = {}      
           vue.creatingServer = false;
-          await vue.refreshServers();
+          vue.servers.push(data)
+        },
+        onFail: (data) => {
+          vue.ShowErrorTooltip(data.message || "")
+        },
+        onError: (data) => {
+          vue.ShowErrorTooltip(data.message || "")
+        },
+        allways: () => {
+          loading.close();
+        }
+      })
+    },
+    deleteServer: async function(id){
+      const loading = this.$vs.loading()
+      let vue = this;
+
+      await this.delete(`admin/discord-servers`,id, {
+        onSuccess: async () => {
+          vue.servers = vue.servers.filter(x => x.id != id)
         },
         onFail: (data) => {
           vue.ShowErrorTooltip(data.message || "")
@@ -134,7 +152,7 @@ export default {
     refreshServers: async function(){
       let vue = this;
 
-      await this.get(`discord-servers`,{}, {
+      await this.get(`discord-servers`, {
         onSuccess: async (data) => {
           vue.servers = data
         }

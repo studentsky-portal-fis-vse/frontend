@@ -133,9 +133,64 @@ const MyPlugin = {
           error: e
         }
       }
-      let responseJson = await response.json()
 
+      let responseJson = {};
+      await response.json()
+      .then(data => responseJson = data)
+      .catch(() => { })
+  
       if(response.status === 200 || response.status === 201){
+        if(options.onSuccess){
+          await options.onSuccess(responseJson, response.status)
+          success = true;
+        }
+      }else
+        if(options.onError)
+          await options.onError(responseJson, response.status)
+        else
+          Vue.prototype.ShowErrorTooltip(responseJson.message || "Něco se pokazilo")
+      
+      if(options.allways)
+        await options.allways()
+
+      return {
+        success: success,
+        code: response.status,
+        data: responseJson
+      };
+    },
+    Vue.prototype.delete = async (url, id, options = {}) => {
+      let response;
+      let success = false;
+      try{
+        response = await fetch(`${process.env.VUE_APP_API_URL}/${url}/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization' : `Bearer ${localStorage.token}`
+          }
+        })
+      }catch(e){
+        if(options.onFail)
+          await options.onFail()
+        else  
+          Vue.prototype.ShowErrorTooltip("Něco se pokazilo")    
+
+        if(options.allways)
+          await options.allways()
+
+        return {
+          success: success,
+          error: e
+        }
+      }
+
+      let responseJson = {};
+      await response.json()
+      .then(data => responseJson = data)
+      .catch(() => { })
+
+      if(response.status === 200){
         if(options.onSuccess){
           await options.onSuccess(responseJson, response.status)
           success = true;
@@ -180,7 +235,11 @@ const MyPlugin = {
           error: e
         }
       }
-      let responseJson = await response.json()
+
+      let responseJson = {};
+      await response.json()
+      .then(data => responseJson = data)
+      .catch(() => { })
 
       if(response.status === 200 || response.status === 201){
         if(options.onSuccess){
