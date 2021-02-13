@@ -58,6 +58,12 @@ const routes = [
     meta: { title: 'Terénování' },
     component: () =>
       import("../views/Training.vue")
+  },{
+    path: "/admin/users",
+    name: "Users",
+    meta: { title: 'Administrace - uživatelé' },
+    component: () =>
+      import("../views/Users.vue")
   }
 ];
 

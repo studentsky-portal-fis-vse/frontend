@@ -159,6 +159,58 @@ const MyPlugin = {
         data: responseJson
       };
     },
+    Vue.prototype.put = async (url, data = {}, options = {}) => {
+      let response;
+      let success = false;
+      try{
+        response = await fetch(`${process.env.VUE_APP_API_URL}/${url}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization' : `Bearer ${localStorage.token}`
+          },
+          body: JSON.stringify(data),
+        })
+      }catch(e){
+        if(options.onFail)
+          await options.onFail()
+        else  
+          Vue.prototype.ShowErrorTooltip("Něco se pokazilo")    
+
+        if(options.allways)
+          await options.allways()
+
+        return {
+          success: success,
+          error: e
+        }
+      }
+
+      let responseJson = {};
+      await response.json()
+      .then(data => responseJson = data)
+      .catch(() => { })
+  
+      if(response.status === 200 || response.status === 201){
+        if(options.onSuccess){
+          await options.onSuccess(responseJson, response.status)
+          success = true;
+        }
+      }else
+        if(options.onError)
+          await options.onError(responseJson, response.status)
+        else
+          Vue.prototype.ShowErrorTooltip(responseJson.message || "Něco se pokazilo")
+      
+      if(options.allways)
+        await options.allways()
+
+      return {
+        success: success,
+        code: response.status,
+        data: responseJson
+      };
+    },
     Vue.prototype.delete = async (url, id, options = {}) => {
       let response;
       let success = false;
@@ -260,6 +312,17 @@ const MyPlugin = {
         code: response.status,
         data: responseJson
       };
+    }
+    Vue.prototype.loadingStart = () => {
+      Vue.prototype.loadingContent = Vue.prototype.$vs.loading({
+        target: "#content-wrapper"
+      })  
+    }
+    Vue.prototype.loadingEnd = () => {
+      if(Vue.prototype.loadingContent){
+        Vue.prototype.loadingContent.close();
+        Vue.prototype.loadingContent = null
+      }
     }
   }
 }

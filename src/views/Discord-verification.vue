@@ -26,7 +26,6 @@
 export default {
   name: "Discord-verification",
   components: {
-    //HelloWorld
   },
   data: function(){
     return {

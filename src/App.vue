@@ -41,6 +41,14 @@
             </vs-navbar-item>
           </template>
         </vs-navbar-group>
+        <vs-navbar-group v-if="getUser().admin">
+          Administrace
+          <template #items>
+            <vs-navbar-item to="/admin/users" :active="currentRouteName == 'Users'">
+              Uživatelé
+            </vs-navbar-item>
+          </template>
+        </vs-navbar-group>
         <template #right>
           <vs-avatar primary size="30">
             <template #text>
@@ -75,6 +83,9 @@ module.exports = {
   },
   created: function(){
     this.checkTokenInterval = setInterval(() => this.checkToken(), 6000);
+  },
+  mounted: function(){
+    this.checkToken();
   },
   computed: {
     currentRouteName: function (){
@@ -134,6 +145,9 @@ html, body {
   z-index: 500 !important;
 }
 
+.vs-dialog-content{
+  z-index: 499 !important;
+}
 .center{
   margin: auto !important;
 }
